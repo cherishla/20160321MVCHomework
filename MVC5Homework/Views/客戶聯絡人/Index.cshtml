@@ -12,7 +12,7 @@
             @Html.ActionLink("Create New", "Create") |
         </td>
         <td>
-            @using (Html.BeginForm("Index", "客戶聯絡人", FormMethod.Post, new { keyword = "keyword" }))
+            @using (Html.BeginForm("Index", "客戶聯絡人", FormMethod.Post))
             {
                 @Html.TextBox("keyword")
                 <input type="submit" value="搜尋" />
