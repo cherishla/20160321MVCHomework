@@ -14,8 +14,9 @@ namespace MVC5Homework.Models
     
     public partial class CustomerStatistics
     {
+        public int Expr1 { get; set; }
         public string 客戶名稱 { get; set; }
-        public Nullable<int> 銀行帳戶資料 { get; set; }
         public Nullable<int> 聯絡人數量 { get; set; }
+        public Nullable<int> 銀行帳戶資料 { get; set; }
     }
 }

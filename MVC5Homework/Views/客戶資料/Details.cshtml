@@ -17,7 +17,13 @@
         <dd>
             @Html.DisplayFor(model => model.客戶名稱)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.客戶分類.類別)
+        </dt>
 
+        <dd>
+            @Html.DisplayFor(model => model.客戶分類.類別)
+        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.統一編號)
         </dt>
@@ -59,8 +65,16 @@
         </dd>
 
     </dl>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+    <hr />
 </div>
+
+@{
+    Html.RenderAction("BatchUpdate", "客戶聯絡人", new { 客戶Id = Model.Id });
+}
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

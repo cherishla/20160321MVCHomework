@@ -28,7 +28,7 @@ namespace MVC5Homework.Models
         public string 帳戶名稱 { get; set; }
         
         [StringLength(20, ErrorMessage="欄位長度不得大於 20 個字元")]
-        [RegularExpression(@"^[0-9]",ErrorMessage ="只可輸入數字")]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage ="只可輸入數字")]
         [Required]
         public string 帳戶號碼 { get; set; }
     

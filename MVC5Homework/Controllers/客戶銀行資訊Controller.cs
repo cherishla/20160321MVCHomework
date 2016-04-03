@@ -7,19 +7,24 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MVC5Homework.Models;
+using NPOI.XSSF.UserModel;
+using System.IO;
 
 namespace MVC5Homework.Controllers
 {
     public class 客戶銀行資訊Controller : Controller
     {
-        private CustomerEntities db = new CustomerEntities();
+        private 客戶銀行資訊Repository repo = RepositoryHelper.Get客戶銀行資訊Repository();
+        private 客戶資料Repository repo_客戶資料 = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶銀行資訊
         public ActionResult Index()
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料).AsQueryable();
-            客戶銀行資訊 = 客戶銀行資訊.Where(p => p.是否已刪除 == false);
-            return View(客戶銀行資訊.ToList());
+             CustomerEntities db = new CustomerEntities();
+            //TODO Include
+            var 客戶銀行資訊 = repo.All(false).Include(p=>p.客戶資料);
+            
+            return View(客戶銀行資訊);
         }
 
         [HttpPost]
@@ -29,11 +34,8 @@ namespace MVC5Homework.Controllers
             {
                 RedirectToAction("Index");
             }
-            var data = db.客戶銀行資訊.AsQueryable();
-            data = data.Where(p => p.帳戶名稱.Contains(keyword)
-                    || p.分行代碼.ToString().Contains(keyword) || p.帳戶號碼.Contains(keyword)
-                    || p.銀行代碼.ToString().Contains(keyword) || p.銀行名稱.Contains(keyword)
-                    ).Where(p => p.是否已刪除 == false);
+            var data = repo.Search(keyword).Include(p => p.客戶資料);
+            TempData["keyword"] = keyword;
 
             return View(data.ToList());
         }
@@ -45,7 +47,7 @@ namespace MVC5Homework.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -56,7 +58,7 @@ namespace MVC5Homework.Controllers
         // GET: 客戶銀行資訊/Create
         public ActionResult Create()
         {
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱");
+            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱");
             return View();
         }
 
@@ -69,12 +71,12 @@ namespace MVC5Homework.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.客戶銀行資訊.Add(客戶銀行資訊);
-                db.SaveChanges();
+                repo.Add(客戶銀行資訊);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
+            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
             return View(客戶銀行資訊);
         }
 
@@ -85,12 +87,12 @@ namespace MVC5Homework.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
+            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
             return View(客戶銀行資訊);
         }
 
@@ -103,11 +105,11 @@ namespace MVC5Homework.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶銀行資訊).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.UnitOfWork.Context.Entry(客戶銀行資訊).State = EntityState.Modified;
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
+            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
             return View(客戶銀行資訊);
         }
 
@@ -118,7 +120,7 @@ namespace MVC5Homework.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -131,10 +133,10 @@ namespace MVC5Homework.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id);
             //db.客戶銀行資訊.Remove(客戶銀行資訊);
-            客戶銀行資訊.是否已刪除 = true;
-            db.SaveChanges();
+            repo.Delete(客戶銀行資訊);
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -142,9 +144,52 @@ namespace MVC5Homework.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repo.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult ExportExcel(string keyword)
+        {
+            XSSFWorkbook excel = new XSSFWorkbook();
+            XSSFSheet sheet = excel.CreateSheet("客戶銀行資訊") as XSSFSheet;
+
+            List<客戶銀行資訊> data = new List<客戶銀行資訊>();
+            if (string.IsNullOrEmpty(keyword))
+                data = repo.All(false).Include(p => p.客戶資料).ToList();
+            else
+                data = repo.Search(keyword).Include(p => p.客戶資料).ToList();
+
+            if (data.Count() == 0)
+            {
+                TempData["ErrMsg"] = "沒有資料可以匯出";
+                return RedirectToAction("Index");
+
+            }
+            sheet.CreateRow(0);
+            sheet.GetRow(0).CreateCell(0).SetCellValue("銀行名稱");
+            sheet.GetRow(0).CreateCell(1).SetCellValue("銀行代碼");
+            sheet.GetRow(0).CreateCell(2).SetCellValue("分行代碼");
+            sheet.GetRow(0).CreateCell(3).SetCellValue("帳戶名稱");
+            sheet.GetRow(0).CreateCell(4).SetCellValue("帳戶號碼");
+            sheet.GetRow(0).CreateCell(5).SetCellValue("客戶名稱");
+
+            for (int i = 1; i <= data.Count(); i++)
+            {
+                sheet.CreateRow(i);
+                var item = data[i - 1];
+                sheet.GetRow(i).CreateCell(0).SetCellValue(item.銀行名稱);
+                sheet.GetRow(i).CreateCell(1).SetCellValue(item.銀行代碼);
+                sheet.GetRow(i).CreateCell(2).SetCellValue(item.分行代碼.HasValue ? Convert.ToString(item.分行代碼) : "");
+                sheet.GetRow(i).CreateCell(3).SetCellValue(item.帳戶名稱);
+                sheet.GetRow(i).CreateCell(4).SetCellValue(item.帳戶號碼);
+                sheet.GetRow(i).CreateCell(5).SetCellValue(item.客戶資料.客戶名稱);
+            }
+
+            MemoryStream ms = new MemoryStream();
+            excel.Write(ms);
+            excel = null;
+            return File(ms.ToArray(), "application/excel", "Report.xlsx");
         }
     }
 }

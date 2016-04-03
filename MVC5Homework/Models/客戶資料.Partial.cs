@@ -19,8 +19,9 @@ namespace MVC5Homework.Models
         public string 客戶名稱 { get; set; }
         
         [StringLength(8, ErrorMessage="欄位長度不得大於 8 個字元")]
+        [MinLength(7, ErrorMessage ="統一編號格式錯誤")]
         [Required]
-        [RegularExpression(@"^[0-9]", ErrorMessage = "只可輸入數字")]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "只可輸入數字")]
         public string 統一編號 { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
@@ -38,8 +39,13 @@ namespace MVC5Homework.Models
         [StringLength(250, ErrorMessage="欄位長度不得大於 250 個字元")]
         [EmailAddress(ErrorMessage ="Email 格式錯誤")]
         public string Email { get; set; }
-    
+
+        [Required]
+        public int 類別Id { get; set; }
+
         public virtual ICollection<客戶銀行資訊> 客戶銀行資訊 { get; set; }
         public virtual ICollection<客戶聯絡人> 客戶聯絡人 { get; set; }
+        public virtual 客戶分類 客戶分類 { get; set; }
+
     }
 }

@@ -3,9 +3,14 @@
 @{
     ViewBag.Title = "Index";
 }
- 
-<h2>客戶資料管理</h2>
 
+<h2>客戶資料管理</h2>
+@if (TempData["ErrMsg"] != null)
+{
+    <script>
+        alert('@TempData["ErrMsg"]');
+    </script>
+}
 <table>
     <tr>
         <td style="vertical-align:middle">
@@ -14,9 +19,26 @@
         <td>
             @using (Html.BeginForm("Index", "客戶資料", FormMethod.Post, new { keyword = "keyword" }))
             {
-                @Html.TextBox("keyword")
-                <input type="submit" value="搜尋" />
+                <table>
+                    <tr>
+                        <td>
+                            @Html.DropDownList("類別Id", null, "全部", new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.TextBox("keyword", null, htmlAttributes: new { @class = "form-control" })
+                        </td>
+                        <td>
+                            <input type="submit" value="搜尋" class="btn btn-default"/>
+                        </td>
+                    </tr>
+                </table>
             }
+        </td>
+        <td>
+            | <button id="btnExport" class="btn btn-default">匯出Excxel</button>
+            <input type="hidden" id="currentKeyword" value="@TempData["keyword"]" />
+            <input type="hidden" id="currentCategory" value="@TempData["Category"]" />
+            
         </td>
     </tr>
 </table>
@@ -25,6 +47,9 @@
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.客戶名稱)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.客戶分類.類別)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.統一編號)
@@ -50,6 +75,9 @@
             @Html.DisplayFor(modelItem => item.客戶名稱)
         </td>
         <td>
+            @Html.DisplayFor(modelItem => item.客戶分類.類別)
+        </td>
+        <td>
             @Html.DisplayFor(modelItem => item.統一編號)
         </td>
         <td>
@@ -73,3 +101,18 @@
 }
 
 </table>
+
+@section scripts{ 
+    <script>
+        $(function () {
+            $("#btnExport").click(function () {
+
+                
+                var keyword = $("#currentKeyword").val();
+                var categoryID = $('#currentCategory').val();
+                var url = '@Url.Action("ExportExcel")' + "?keyword=" + keyword + "&categoryID=" + categoryID;
+                location.href = url;
+            });
+        });
+    </script>
+}

@@ -5,7 +5,12 @@
 }
 
 <h2>客戶銀行帳號管理</h2>
-
+@if (TempData["ErrMsg"] != null)
+{
+    <script>
+        alert('@TempData["ErrMsg"]');
+    </script>
+}
 <table>
     <tr>
         <td style="vertical-align:middle">
@@ -15,8 +20,12 @@
             @using (Html.BeginForm("Index", "客戶銀行資訊", FormMethod.Post, new { keyword = "keyword" }))
             {
                 @Html.TextBox("keyword")
-                <input type="submit" value="搜尋" />
+                <input type="submit" value="搜尋" class="btn btn-default" />
             }
+        </td>
+        <td>
+            | <button id="btnExport" class="btn btn-default">匯出Excxel</button>
+            <input type="hidden" id="currentKeyword" value="@TempData["keyword"]" />
         </td>
     </tr>
 </table>
@@ -72,3 +81,14 @@
 }
 
 </table>
+@section scripts{
+    <script>
+        $(function () {
+            $("#btnExport").click(function () {
+                var keyword = $("#currentKeyword").val();
+                var url = '@Url.Action("ExportExcel")' + "?keyword=" + keyword;
+                location.href = url;
+            });
+        });
+    </script>
+}
