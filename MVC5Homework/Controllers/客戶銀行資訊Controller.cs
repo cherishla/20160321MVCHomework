@@ -22,7 +22,7 @@ namespace MVC5Homework.Controllers
         {
              CustomerEntities db = new CustomerEntities();
             //TODO Include
-            var 客戶銀行資訊 = repo.All(false).Include(p=>p.客戶資料);
+            var 客戶銀行資訊 = repo.All(false);
             
             return View(客戶銀行資訊);
         }
@@ -34,7 +34,7 @@ namespace MVC5Homework.Controllers
             {
                 RedirectToAction("Index");
             }
-            var data = repo.Search(keyword).Include(p => p.客戶資料);
+            var data = repo.Search(keyword);
             TempData["keyword"] = keyword;
 
             return View(data.ToList());
@@ -149,16 +149,17 @@ namespace MVC5Homework.Controllers
             base.Dispose(disposing);
         }
 
-        public ActionResult ExportExcel(string keyword)
+        [HttpPost]
+        public ActionResult ExportExcel(string currentKeyword)
         {
             XSSFWorkbook excel = new XSSFWorkbook();
             XSSFSheet sheet = excel.CreateSheet("客戶銀行資訊") as XSSFSheet;
 
             List<客戶銀行資訊> data = new List<客戶銀行資訊>();
-            if (string.IsNullOrEmpty(keyword))
-                data = repo.All(false).Include(p => p.客戶資料).ToList();
+            if (string.IsNullOrEmpty(currentKeyword))
+                data = repo.All(false).ToList();
             else
-                data = repo.Search(keyword).Include(p => p.客戶資料).ToList();
+                data = repo.Search(currentKeyword).ToList();
 
             if (data.Count() == 0)
             {

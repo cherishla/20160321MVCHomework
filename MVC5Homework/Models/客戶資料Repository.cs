@@ -1,14 +1,15 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-	
+using System.Data.Entity;
+
 namespace MVC5Homework.Models
 {   
 	public  class 客戶資料Repository : EFRepository<客戶資料>, I客戶資料Repository
 	{
         public override IQueryable<客戶資料> All()
         {
-            return base.All().Where(p => p.是否已刪除 == false);
+            return base.All().Include(p=>p.客戶分類).Where(p => p.是否已刪除 == false);
         }
         /// <summary>
         /// 搜尋全部資料
@@ -19,7 +20,7 @@ namespace MVC5Homework.Models
         {
             if (isAll)
             {
-                return base.All();
+                return base.All().Include(p => p.客戶分類);
             }
             else
             {

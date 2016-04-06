@@ -1,14 +1,15 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-	
+using System.Data.Entity;
+
 namespace MVC5Homework.Models
 {   
 	public  class 客戶聯絡人Repository : EFRepository<客戶聯絡人>, I客戶聯絡人Repository
 	{
         public override IQueryable<客戶聯絡人> All()
         {
-            return base.All().Where(p => p.是否已刪除 == false);
+            return base.All().Include(p=>p.客戶資料).Where(p => p.是否已刪除 == false);
         }
 
         /// <summary>
@@ -20,7 +21,7 @@ namespace MVC5Homework.Models
         {
             if (isAll)
             {
-                return base.All();
+                return base.All().Include(p => p.客戶資料);
             }
             else
             {

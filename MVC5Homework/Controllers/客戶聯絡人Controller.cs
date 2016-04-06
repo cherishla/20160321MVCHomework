@@ -20,7 +20,7 @@ namespace MVC5Homework.Controllers
         // GET: 客戶聯絡人
         public ActionResult Index()
         {
-            var 客戶聯絡人 = repo.All(false).Include(p => p.客戶資料);
+            var 客戶聯絡人 = repo.All(false);
             return View(客戶聯絡人.ToList());
         }
 
@@ -31,7 +31,7 @@ namespace MVC5Homework.Controllers
             {
                 RedirectToAction("Index");
             }
-            var data = repo.Search(keyword).Include(p => p.客戶資料);
+            var data = repo.Search(keyword);
             TempData["keyword"] = keyword;
 
             return View(data.ToList());
@@ -144,16 +144,17 @@ namespace MVC5Homework.Controllers
             }
             base.Dispose(disposing);
         }
-        public ActionResult ExportExcel(string keyword)
+        [HttpPost]
+        public ActionResult ExportExcel(string currentKeyword)
         {
             XSSFWorkbook excel = new XSSFWorkbook();
             XSSFSheet sheet = excel.CreateSheet("客戶銀行資訊") as XSSFSheet;
 
-            List<客戶聯絡人> data = new List<客戶聯絡人>();
-            if (string.IsNullOrEmpty(keyword))
-                data = repo.All(false).Include(p => p.客戶資料).ToList();
+            var data = new List<客戶聯絡人>();
+            if (string.IsNullOrEmpty(currentKeyword))
+                data = repo.All(false).ToList();
             else
-                data = repo.Search(keyword).Include(p => p.客戶資料).ToList();
+                data = repo.Search(currentKeyword).ToList();
 
             if (data.Count() == 0)
             {
@@ -190,7 +191,7 @@ namespace MVC5Homework.Controllers
 
         public ActionResult BatchUpdate(int? 客戶Id)
         {
-            var data = repo.GetDataByID(客戶Id).Include(p =>p.客戶資料);
+            var data = repo.GetDataByID(客戶Id);
             ViewData.Model = data;
             ViewBag.客戶Id = 客戶Id;
             return PartialView();
@@ -201,7 +202,7 @@ namespace MVC5Homework.Controllers
         {
             if (data == null)
             {
-                ViewData.Model = repo.GetDataByID(客戶Id).Include(p => p.客戶資料);
+                ViewData.Model = repo.GetDataByID(客戶Id);
                 TempData["UpdateMsg"] = "沒有資料可以更新!";
 
                 return PartialView();
@@ -218,7 +219,7 @@ namespace MVC5Homework.Controllers
                 repo.UnitOfWork.Commit();
                 TempData["UpdateMsg"] = "聯絡人更新成功!";
             }
-            ViewData.Model = repo.GetDataByID(客戶Id).Include(p => p.客戶資料);
+            ViewData.Model = repo.GetDataByID(客戶Id);
             ViewBag.客戶Id = 客戶Id;
 
             if (TempData["UpdateMsg"] == null)

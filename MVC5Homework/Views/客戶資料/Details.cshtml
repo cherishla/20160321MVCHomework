@@ -73,7 +73,7 @@
 </div>
 
 @{
-    Html.RenderAction("BatchUpdate", "客戶聯絡人", new { 客戶Id = Model.Id });
+    Html.Action("BatchUpdate", "客戶聯絡人", new { 客戶Id = Model.Id });
 }
 <p>
     @Html.ActionLink("Back to List", "Index")

@@ -17,12 +17,12 @@
             @Html.ActionLink("Create New", "Create") |
         </td>
         <td>
-            @using (Html.BeginForm("Index", "客戶資料", FormMethod.Post, new { keyword = "keyword" }))
+            @using (Html.BeginForm())
             {
                 <table>
                     <tr>
                         <td>
-                            @Html.DropDownList("類別Id", null, "全部", new { @class = "form-control" })
+                            @Html.DropDownList("類別Id", null, "全部", new { @class = "form-control", onChange= "CategorySelect();" })
                         </td>
                         <td>
                             @Html.TextBox("keyword", null, htmlAttributes: new { @class = "form-control" })
@@ -30,14 +30,18 @@
                         <td>
                             <input type="submit" value="搜尋" class="btn btn-default"/>
                         </td>
+                        <td>
+                            | <input type="submit" value="匯出Excxel" class="btn btn-default" formaction="@Url.Action("ExportExcel") "  />
+                            @Html.Hidden("currentKeyword", TempData["keyword"])
+                            @Html.Hidden("categoryID", TempData["Category"])
+                          
+                        </td>
                     </tr>
                 </table>
             }
         </td>
         <td>
-            | <button id="btnExport" class="btn btn-default">匯出Excxel</button>
-            <input type="hidden" id="currentKeyword" value="@TempData["keyword"]" />
-            <input type="hidden" id="currentCategory" value="@TempData["Category"]" />
+           
             
         </td>
     </tr>
@@ -104,15 +108,9 @@
 
 @section scripts{ 
     <script>
-        $(function () {
-            $("#btnExport").click(function () {
-
-                
-                var keyword = $("#currentKeyword").val();
-                var categoryID = $('#currentCategory').val();
-                var url = '@Url.Action("ExportExcel")' + "?keyword=" + keyword + "&categoryID=" + categoryID;
-                location.href = url;
-            });
-        });
+        function CategorySelect()
+        {
+            $("form").submit();
+        }
     </script>
 }

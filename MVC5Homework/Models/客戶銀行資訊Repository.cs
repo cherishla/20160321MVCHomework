@@ -1,14 +1,15 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-	
+using System.Data.Entity;
+
 namespace MVC5Homework.Models
 {   
 	public  class 客戶銀行資訊Repository : EFRepository<客戶銀行資訊>, I客戶銀行資訊Repository
 	{
         public override IQueryable<客戶銀行資訊> All()
         {
-            return base.All().Where(p => p.是否已刪除 == false);
+            return base.All().Include(p => p.客戶資料).Where(p => p.是否已刪除 == false);
         }
 
  
@@ -21,14 +22,14 @@ namespace MVC5Homework.Models
         {
             if (isAll)
             {
-                return base.All();
+                return base.All().Include(p => p.客戶資料);
             }
             else
             {
                 return this.All();
             }
         }
-        /// <summary>
+        /// <summary>b
         /// 搜尋客戶銀行資料
         /// </summary>
         /// <param name="keyword"></param>

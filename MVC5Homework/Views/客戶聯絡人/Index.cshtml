@@ -17,16 +17,15 @@
             @Html.ActionLink("Create New", "Create") |
         </td>
         <td>
-            @using (Html.BeginForm("Index", "客戶聯絡人", FormMethod.Post))
+            @using (Html.BeginForm())
             {
                 @Html.TextBox("keyword")
-                <input type="submit" value="搜尋" class="btn btn-default" />
+                <input type="submit" value="搜尋" class="btn btn-default" formaction="@Url.Action("Index")" /> @:|
+                <input type="submit" class="btn btn-default" value="匯出Excxel" formaction="@Url.Action("ExportExcel")" />
+                @Html.Hidden("currentKeyword", TempData["keyword"])
             }
         </td>
-        <td>
-            | <button id="btnExport" class="btn btn-default">匯出Excxel</button>
-            <input type="hidden" id="currentKeyword" value="@TempData["keyword"]" />
-        </td>
+        
     </tr>
 </table>
 <table class="table">
@@ -81,14 +80,3 @@
 }
 
 </table>
-@section scripts{
-    <script>
-        $(function () {
-            $("#btnExport").click(function () {
-                var keyword = $("#currentKeyword").val();
-                var url = '@Url.Action("ExportExcel")' + "?keyword=" + keyword;
-                location.href = url;
-            });
-        });
-    </script>
-}

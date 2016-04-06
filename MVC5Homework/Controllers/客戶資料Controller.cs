@@ -9,6 +9,8 @@ using System.Web.Mvc;
 using MVC5Homework.Models;
 using NPOI.XSSF.UserModel;
 using System.IO;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace MVC5Homework.Controllers
 {
@@ -19,7 +21,7 @@ namespace MVC5Homework.Controllers
         // GET: 客戶資料
         public ActionResult Index()
         {
-            var data = repo.All(false).Include(p => p.客戶分類);
+            var data = repo.All(false);
             ViewBag.類別Id = new SelectList(repo_客戶分類.All(), "Id", "類別");
             return View(data.ToList());
         }
@@ -31,7 +33,7 @@ namespace MVC5Homework.Controllers
             {
                 RedirectToAction("Index");
             }
-            var data = repo.Search(類別Id, keyword).Include(p => p.客戶分類);
+            var data = repo.Search(類別Id, keyword);
             ViewBag.類別Id = new SelectList(repo_客戶分類.All(), "Id", "類別",  類別Id);
             TempData["keyword"] = keyword;
             TempData["Category"] = 類別Id;
@@ -154,17 +156,17 @@ namespace MVC5Homework.Controllers
             var data = repo_CustomerView.All();
             return View(data);
         }
-
-        public ActionResult ExportExcel(string keyword, string categoryID)
+        [HttpPost]
+        public ActionResult ExportExcel(string currentKeyword, string categoryID)
         {
             XSSFWorkbook excel = new XSSFWorkbook();
             XSSFSheet sheet = excel.CreateSheet("客戶資料") as XSSFSheet;
 
             List<客戶資料> data = new List<客戶資料>();
-            if(string.IsNullOrEmpty(keyword) && string.IsNullOrEmpty(categoryID))
-                data = repo.All(false).Include(p=>p.客戶分類).ToList();
+            if(string.IsNullOrEmpty(currentKeyword) && string.IsNullOrEmpty(categoryID))
+                data = repo.All(false).ToList();
             else
-                data = repo.Search(categoryID, keyword).Include(p => p.客戶分類).ToList();
+                data = repo.Search(categoryID, currentKeyword).ToList();
 
             if (data.Count() == 0)
             {
@@ -172,6 +174,8 @@ namespace MVC5Homework.Controllers
                 return RedirectToAction("Index");
 
             }
+
+          
             sheet.CreateRow(0);
             sheet.GetRow(0).CreateCell(0).SetCellValue("客戶名稱");
             sheet.GetRow(0).CreateCell(1).SetCellValue("類別");
