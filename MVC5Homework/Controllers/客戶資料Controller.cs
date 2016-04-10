@@ -29,7 +29,7 @@ namespace MVC5Homework.Controllers
         [HttpPost]
         public ActionResult Index(string 類別Id, string keyword)
         {
-            if (!string.IsNullOrEmpty(keyword))
+            if (string.IsNullOrEmpty(keyword) && string.IsNullOrEmpty(類別Id))
             {
                 RedirectToAction("Index");
             }
