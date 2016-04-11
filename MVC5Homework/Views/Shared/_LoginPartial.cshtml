@@ -5,12 +5,14 @@
     {
     @Html.AntiForgeryToken()
 
-    <ul class="nav navbar-nav navbar-right">
-        <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
-        </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">登出</a></li>
-    </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Edit", "客戶資料", routeValues: new { id = '1' }, htmlAttributes: new { title = "Manage" })
+            </li>
+            <li>
+                @Html.ActionLink("登出", "Logout", "Account")
+            </li>
+        </ul>
     }
 }
 else

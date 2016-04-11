@@ -12,6 +12,8 @@ using System.IO;
 
 namespace MVC5Homework.Controllers
 {
+    [Authorize(Roles = "admin")]
+    [計算Action的執行時間]
     public class 客戶銀行資訊Controller : Controller
     {
         private 客戶銀行資訊Repository repo = RepositoryHelper.Get客戶銀行資訊Repository();

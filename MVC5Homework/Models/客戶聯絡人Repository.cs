@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Web.Mvc;
 
 namespace MVC5Homework.Models
 {   
@@ -29,24 +30,31 @@ namespace MVC5Homework.Models
             }
         }
 
+        internal IQueryable<SelectListItem> GetJobFunc(string JobFunc)
+        {
+            return All(false).Select(p => new SelectListItem() { Text = p.職稱, Selected = p.職稱 == JobFunc }).Distinct();
+        }
+
         /// <summary>
         /// 搜尋客戶聯絡人
         /// </summary>
         /// <param name="keyword"></param>
+        /// <param name="JobFunc"></param>
         /// <returns></returns>
-        public IQueryable<客戶聯絡人> Search(string keyword)
+        public IQueryable<客戶聯絡人> Search(string keyword, string JobFunc)
         {
-            if (string.IsNullOrEmpty(keyword))
+            
+            var data = All(false).Where(
+                        p => p.姓名.Contains(keyword) || p.客戶資料.客戶名稱.Contains(keyword)
+                        || p.電話.Contains(keyword) || p.手機.Contains(keyword)
+                        || p.Email.Contains(keyword));
+
+            if (!string.IsNullOrEmpty(JobFunc))
             {
-                return All(false);
+                data = data.Where(p => p.職稱 == JobFunc);
             }
-            else
-            {
-                return All(false).Where(
-                       p => p.姓名.Contains(keyword) || p.客戶資料.客戶名稱.Contains(keyword)
-                    || p.電話.Contains(keyword) || p.手機.Contains(keyword)
-                    || p.職稱.Contains(keyword) || p.Email.Contains(keyword));
-            }
+
+            return data;
         }
 
         /// <summary>

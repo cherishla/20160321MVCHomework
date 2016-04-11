@@ -9,31 +9,73 @@ using System.Web.Mvc;
 using MVC5Homework.Models;
 using NPOI.XSSF.UserModel;
 using System.IO;
+using System.Linq.Dynamic;
 
 namespace MVC5Homework.Controllers
 {
+    [Authorize(Roles = "admin")]
+    [計算Action的執行時間]
+
     public class 客戶聯絡人Controller : Controller
     {
         private 客戶聯絡人Repository repo = RepositoryHelper.Get客戶聯絡人Repository();
         private 客戶資料Repository repo_客戶資料 = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶聯絡人
-        public ActionResult Index()
+        public ActionResult Index(string id, string sort, FormCollection form)
         {
+          
             var 客戶聯絡人 = repo.All(false);
-            return View(客戶聯絡人.ToList());
-        }
+            ViewBag.JobFunc = repo.GetJobFunc("");
+           
 
+            if (!string.IsNullOrEmpty(id))
+            {
+                if (id == "客戶名稱")
+                {
+                    if (sort != id)
+                    {
+                        ViewBag.sort = $@"{id}";
+                        客戶聯絡人 = 客戶聯絡人.OrderBy(p => p.客戶資料.客戶名稱);
+                    }
+                    else {
+                        sort = $@"{id} desc";
+                        ViewBag.sort = sort;
+                        客戶聯絡人 = 客戶聯絡人.OrderByDescending(p => p.客戶資料.客戶名稱);
+                    }
+                }
+                else
+                {
+                    if (sort == id)
+                    {
+                        sort = $@"{id} desc";
+                        ViewBag.sort = sort;
+                        客戶聯絡人 = 客戶聯絡人.OrderBy(sort);
+                    }
+                    else
+                    {
+                        客戶聯絡人 = 客戶聯絡人.OrderBy(id);
+                        ViewBag.sort = $@"{id}";
+
+                    }
+                }
+            }
+            return View(客戶聯絡人.ToList());
+
+        }
         [HttpPost]
-        public ActionResult Index(string keyword)
+        public ActionResult Index(string keyword, string JobFunc)
         {
-            if (string.IsNullOrEmpty(keyword))
+            if (string.IsNullOrEmpty(keyword) && string.IsNullOrEmpty(JobFunc)) 
             {
                 RedirectToAction("Index");
             }
-            var data = repo.Search(keyword);
+            var data = repo.Search(keyword, JobFunc);
             TempData["keyword"] = keyword;
+            TempData["JobFunc"] = JobFunc;
+            ViewBag.JobFunc = repo.GetJobFunc(JobFunc);
 
+          
             return View(data.ToList());
         }
 
@@ -145,16 +187,16 @@ namespace MVC5Homework.Controllers
             base.Dispose(disposing);
         }
         [HttpPost]
-        public ActionResult ExportExcel(string currentKeyword)
+        public ActionResult ExportExcel(string currentKeyword, string currentJobFunc)
         {
             XSSFWorkbook excel = new XSSFWorkbook();
             XSSFSheet sheet = excel.CreateSheet("客戶銀行資訊") as XSSFSheet;
 
             var data = new List<客戶聯絡人>();
-            if (string.IsNullOrEmpty(currentKeyword))
+            if (string.IsNullOrEmpty(currentKeyword) && string.IsNullOrEmpty(currentJobFunc))
                 data = repo.All(false).ToList();
             else
-                data = repo.Search(currentKeyword).ToList();
+                data = repo.Search(currentKeyword, currentJobFunc).ToList();
 
             if (data.Count() == 0)
             {

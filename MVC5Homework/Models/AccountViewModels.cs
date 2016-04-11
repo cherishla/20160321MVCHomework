@@ -61,6 +61,20 @@ namespace MVC5Homework.Models
         [Display(Name = "記住我?")]
         public bool RememberMe { get; set; }
     }
+    public class CustomLoginViewModel
+    {
+        [Required]
+        public string Account { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "密碼")]
+        public string Password { get; set; }
+
+        [Display(Name = "記住我?")]
+        public bool RememberMe { get; set; }
+    }
+
 
     public class RegisterViewModel
     {

@@ -53,9 +53,17 @@ namespace MVC5Homework.Models
 
         public 客戶資料 Find(int id)
         {
-            return this.All().FirstOrDefault(p => p.Id == id);
+            return this.All(false).FirstOrDefault(p => p.Id == id);
         }
 
+        public 客戶資料 Find(string account, string password)
+        {
+            if(!string.IsNullOrEmpty(password))
+                return this.All(false).FirstOrDefault(p => p.帳號 == account && p.密碼 == password); 
+            else
+                return this.All(false).FirstOrDefault(p => p.帳號 == account);
+
+        }
         public override void Delete(客戶資料 entity)
         {
             entity.是否已刪除 = true;

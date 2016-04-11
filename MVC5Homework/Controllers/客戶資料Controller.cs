@@ -11,18 +11,53 @@ using NPOI.XSSF.UserModel;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography;
+using System.Linq.Dynamic;
 
 namespace MVC5Homework.Controllers
 {
+    [Authorize(Roles ="admin")]
+    [計算Action的執行時間]
     public class 客戶資料Controller : Controller
     {   
          客戶資料Repository repo= RepositoryHelper.Get客戶資料Repository();
         客戶分類Repository repo_客戶分類 = RepositoryHelper.Get客戶分類Repository();
         // GET: 客戶資料
-        public ActionResult Index()
+        public ActionResult Index(string id, string sort, FormCollection form)
         {
             var data = repo.All(false);
             ViewBag.類別Id = new SelectList(repo_客戶分類.All(), "Id", "類別");
+
+            if (!string.IsNullOrEmpty(id))
+            {
+                if (id == "客戶名稱")
+                {
+                    if (sort != id)
+                    {
+                        ViewBag.sort = $@"{id}";
+                        data = data.OrderBy(p => p.客戶分類.類別);
+                    }
+                    else {
+                        sort = $@"{id} desc";
+                        ViewBag.sort = sort;
+                        data = data.OrderByDescending(p => p.客戶分類.類別);
+                    }
+                }
+                else
+                {
+                    if (sort == id)
+                    {
+                        sort = $@"{id} desc";
+                        ViewBag.sort = sort;
+                        data = data.OrderBy(sort);
+                    }
+                    else
+                    {
+                        data = data.OrderBy(id);
+                        ViewBag.sort = $@"{id}";
+
+                    }
+                }
+            }
             return View(data.ToList());
         }
 
@@ -80,6 +115,7 @@ namespace MVC5Homework.Controllers
             return View(客戶資料);
         }
 
+        [Authorize(Roles = "member")]
         // GET: 客戶資料/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -101,6 +137,7 @@ namespace MVC5Homework.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "member")]
         public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,類別Id")] 客戶資料 客戶資料)
         {
             if (ModelState.IsValid)

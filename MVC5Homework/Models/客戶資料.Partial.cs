@@ -17,7 +17,15 @@ namespace MVC5Homework.Models
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
         [Required]
         public string 客戶名稱 { get; set; }
-        
+
+        [StringLength(20, ErrorMessage = "欄位長度不得大於 20 個字元")]
+        [Required]
+        public string 帳號 { get; set; }
+
+        [StringLength(20, ErrorMessage = "欄位長度不得大於 20 個字元")]
+        [Required]
+        public string 密碼 { get; set; }
+
         [StringLength(8, ErrorMessage="欄位長度不得大於 8 個字元")]
         [MinLength(7, ErrorMessage ="統一編號格式錯誤")]
         [Required]
