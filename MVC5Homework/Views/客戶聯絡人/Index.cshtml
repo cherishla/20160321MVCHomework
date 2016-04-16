@@ -11,8 +11,8 @@
         alert('@TempData["ErrMsg"]');
     </script>
 }
-@using (Html.BeginForm())
-{
+@using (Html.BeginForm("Index", "客戶聯絡人", FormMethod.Get, new { name = "form1" }))
+{ 
     <table>
         <tr>
             <td style="vertical-align:middle">
@@ -28,8 +28,7 @@
                 <input type="submit" value="搜尋" class="btn btn-default" formaction="@Url.Action("Index")" />
                 |
                 <input type="submit" class="btn btn-default" value="匯出Excxel" formaction="@Url.Action("ExportExcel")" />
-                @Html.Hidden("currentKeyword", TempData["keyword"])
-                @Html.Hidden("currentJobFunc", TempData["JobFunc"])
+               
 
             </td>
         </tr>
@@ -38,22 +37,22 @@
     <table class="table">
         <tr>
             <th>
-                @Html.ActionLink("職稱", "Index", new { sort = ViewBag.sort, id = "職稱" })
+                @Html.ActionLink("職稱", "Index", null, new { @onclick = "return BindSort(this);" })
             </th>
             <th>
-                @Html.ActionLink("姓名", "Index", new { sort = ViewBag.sort, id = "姓名" })
+                @Html.ActionLink("姓名", "Index", null, new { @onclick = "return BindSort(this);" })
             </th>
             <th>
-                @Html.ActionLink("Email", "Index", new { sort = ViewBag.sort, id = "Email" })
+                @Html.ActionLink("Email", "Index", null, new { @onclick = "return BindSort(this);" })
             </th>
             <th>
-                @Html.ActionLink("手機", "Index", new { sort = ViewBag.sort, id = "手機" })
+                @Html.ActionLink("手機", "Index", null, new { @onclick = "return BindSort(this);" })
             </th>
             <th>
-                @Html.ActionLink("電話", "Index", new { sort = ViewBag.sort, id = "電話" })
+                @Html.ActionLink("電話", "Index", null, new { @onclick = "return BindSort(this);" })
             </th>
             <th>
-                @Html.ActionLink("客戶名稱", "Index", new { sort = ViewBag.sort, id = "客戶名稱" })
+                @Html.ActionLink("客戶名稱", "Index", null, new { @onclick = "return BindSort(this);" })
             </th>
             <th></th>
         </tr>
@@ -88,6 +87,34 @@
         }
 
     </table>
+    @Html.Hidden("page")
+    @Html.Hidden("sort")
+
+    @Html.PagedListPager(Model as IPagedList, p => Url.Action("Index", new { page = p }))
+
 }
 
+@section scripts {
+    <script>
+        $(function () {
+            $('.pagination a').on('click', function () {
+                document.form1.page.value = $(this).text();
+                document.form1.submit();
+                return false;
+            });
+        });
+
+        function BindSort(title) {
+            if(title.innerText == "@ViewBag.sort")
+                $("#sort").val(title.innerText + " desc");
+            else
+                $("#sort").val(title.innerText);
+
+            document.form1.submit();
+
+            return false;
+
+        }
+    </script>
+}
 

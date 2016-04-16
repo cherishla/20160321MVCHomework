@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Web.Mvc;
-
+using System.Linq.Dynamic;
 namespace MVC5Homework.Models
 {   
 	public  class 客戶聯絡人Repository : EFRepository<客戶聯絡人>, I客戶聯絡人Repository
@@ -30,9 +30,35 @@ namespace MVC5Homework.Models
             }
         }
 
+        /// <summary>
+        /// 搜尋全部資料
+        /// </summary>
+        /// <param name="isAll"></param>
+        /// <returns></returns>
+        public IQueryable<客戶聯絡人> All(bool isAll, string keyword, string JobFunc, string sort)
+        {
+            if (sort == "客戶名稱" || sort == "客戶名稱 desc")
+                sort = $@"客戶資料.{sort}";
+
+            if (string.IsNullOrEmpty(keyword) && string.IsNullOrEmpty(JobFunc))
+            {
+                if (isAll)
+                {
+                    return base.All().Include(p => p.客戶資料).OrderBy(sort);
+                }
+                else
+                {
+                    return this.All().OrderBy(sort);
+                }
+            }
+            else
+                return Search(keyword, JobFunc, sort);
+        }
+
         internal IQueryable<SelectListItem> GetJobFunc(string JobFunc)
         {
-            return All(false).Select(p => new SelectListItem() { Text = p.職稱, Selected = p.職稱 == JobFunc }).Distinct();
+            return All(false).Select(p => new SelectListItem() { Text = p.職稱, Value = p.職稱, Selected = p.職稱 == JobFunc }).Distinct();
+            
         }
 
         /// <summary>
@@ -41,7 +67,7 @@ namespace MVC5Homework.Models
         /// <param name="keyword"></param>
         /// <param name="JobFunc"></param>
         /// <returns></returns>
-        public IQueryable<客戶聯絡人> Search(string keyword, string JobFunc)
+        public IQueryable<客戶聯絡人> Search(string keyword, string JobFunc, string sort)
         {
             
             var data = All(false).Where(
@@ -54,7 +80,7 @@ namespace MVC5Homework.Models
                 data = data.Where(p => p.職稱 == JobFunc);
             }
 
-            return data;
+            return data.OrderBy(sort);
         }
 
         /// <summary>

@@ -44,7 +44,7 @@
 
                 <tr>
                     <td>
-                        @Html.EditorFor(modelItem => data[i].職稱)
+                        @Html.EditorFor(modelItem => data[i].職稱, new { htmlAttributes = new { @class = "form-control" } } )
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => data[i].姓名)
@@ -53,10 +53,10 @@
                         @Html.DisplayFor(modelItem => data[i].Email)
                     </td>
                     <td>
-                        @Html.EditorFor(modelItem => data[i].手機)
+                        @Html.EditorFor(modelItem => data[i].手機, new { htmlAttributes = new { @class = "form-control" } } )
                     </td>
                     <td>
-                        @Html.EditorFor(modelItem => data[i].電話)
+                        @Html.EditorFor(modelItem => data[i].電話, new { htmlAttributes = new { @class = "form-control" } } )
                     </td>
                 </tr>
             }

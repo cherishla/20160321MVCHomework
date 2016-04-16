@@ -10,73 +10,24 @@ using MVC5Homework.Models;
 using NPOI.XSSF.UserModel;
 using System.IO;
 using System.Linq.Dynamic;
+using PagedList;
 
 namespace MVC5Homework.Controllers
 {
     [Authorize(Roles = "admin")]
     [計算Action的執行時間]
 
-    public class 客戶聯絡人Controller : Controller
+    public class 客戶聯絡人Controller : BaseController
     {
-        private 客戶聯絡人Repository repo = RepositoryHelper.Get客戶聯絡人Repository();
-        private 客戶資料Repository repo_客戶資料 = RepositoryHelper.Get客戶資料Repository();
-
         // GET: 客戶聯絡人
-        public ActionResult Index(string id, string sort, FormCollection form)
+        public ActionResult Index(string keyword, string JobFunc, string sort = "客戶名稱", int page = 1)
         {
           
-            var 客戶聯絡人 = repo.All(false);
-            ViewBag.JobFunc = repo.GetJobFunc("");
-           
+            var 客戶聯絡人 = repo_客戶聯絡人.All(false, keyword, JobFunc, sort).ToPagedList(page, 2);
+            ViewBag.JobFunc = repo_客戶聯絡人.GetJobFunc("");
+            ViewBag.sort = sort;
+            return View(客戶聯絡人);
 
-            if (!string.IsNullOrEmpty(id))
-            {
-                if (id == "客戶名稱")
-                {
-                    if (sort != id)
-                    {
-                        ViewBag.sort = $@"{id}";
-                        客戶聯絡人 = 客戶聯絡人.OrderBy(p => p.客戶資料.客戶名稱);
-                    }
-                    else {
-                        sort = $@"{id} desc";
-                        ViewBag.sort = sort;
-                        客戶聯絡人 = 客戶聯絡人.OrderByDescending(p => p.客戶資料.客戶名稱);
-                    }
-                }
-                else
-                {
-                    if (sort == id)
-                    {
-                        sort = $@"{id} desc";
-                        ViewBag.sort = sort;
-                        客戶聯絡人 = 客戶聯絡人.OrderBy(sort);
-                    }
-                    else
-                    {
-                        客戶聯絡人 = 客戶聯絡人.OrderBy(id);
-                        ViewBag.sort = $@"{id}";
-
-                    }
-                }
-            }
-            return View(客戶聯絡人.ToList());
-
-        }
-        [HttpPost]
-        public ActionResult Index(string keyword, string JobFunc)
-        {
-            if (string.IsNullOrEmpty(keyword) && string.IsNullOrEmpty(JobFunc)) 
-            {
-                RedirectToAction("Index");
-            }
-            var data = repo.Search(keyword, JobFunc);
-            TempData["keyword"] = keyword;
-            TempData["JobFunc"] = JobFunc;
-            ViewBag.JobFunc = repo.GetJobFunc(JobFunc);
-
-          
-            return View(data.ToList());
         }
 
         // GET: 客戶聯絡人/Details/5
@@ -86,7 +37,7 @@ namespace MVC5Homework.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = repo.Find(id.Value);
+            客戶聯絡人 客戶聯絡人 = repo_客戶聯絡人.Find(id.Value);
             if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
@@ -97,7 +48,6 @@ namespace MVC5Homework.Controllers
         // GET: 客戶聯絡人/Create
         public ActionResult Create()
         {
-            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱");
             return View();
         }
 
@@ -110,12 +60,10 @@ namespace MVC5Homework.Controllers
         {
             if (ModelState.IsValid)
             {
-                repo.Add(客戶聯絡人);
-                repo.UnitOfWork.Commit();
+                repo_客戶聯絡人.Add(客戶聯絡人);
+                repo_客戶聯絡人.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-
-            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
             return View(客戶聯絡人);
         }
 
@@ -126,12 +74,12 @@ namespace MVC5Homework.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = repo.Find(id.Value);
+            客戶聯絡人 客戶聯絡人 = repo_客戶聯絡人.Find(id.Value);
             if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            
             return View(客戶聯絡人);
         }
 
@@ -140,15 +88,15 @@ namespace MVC5Homework.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
+        public ActionResult Edit(int id)
         {
-            if (ModelState.IsValid)
+            var 客戶聯絡人 = repo_客戶聯絡人.Find(id);
+            if (TryUpdateModel(客戶聯絡人, "Id,客戶Id,職稱,姓名,Email,手機,電話".Split(new char[] { ',' })))
             {
-                repo.UnitOfWork.Context.Entry(客戶聯絡人).State = EntityState.Modified;
-                repo.UnitOfWork.Commit();
+                repo_客戶聯絡人.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            ViewBag.客戶Id = new SelectList(repo_客戶資料.All(false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            
             return View(客戶聯絡人);
         }
 
@@ -159,7 +107,7 @@ namespace MVC5Homework.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = repo.Find(id.Value);
+            客戶聯絡人 客戶聯絡人 = repo_客戶聯絡人.Find(id.Value);
             if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
@@ -172,9 +120,9 @@ namespace MVC5Homework.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶聯絡人 客戶聯絡人 = repo.Find(id);
-            repo.Delete(客戶聯絡人);
-            repo.UnitOfWork.Commit();
+            客戶聯絡人 客戶聯絡人 = repo_客戶聯絡人.Find(id);
+            repo_客戶聯絡人.Delete(客戶聯絡人);
+            repo_客戶聯絡人.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -182,22 +130,19 @@ namespace MVC5Homework.Controllers
         {
             if (disposing)
             {
-                repo.UnitOfWork.Context.Dispose();
+                repo_客戶聯絡人.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }
-        [HttpPost]
-        public ActionResult ExportExcel(string currentKeyword, string currentJobFunc)
+        public ActionResult ExportExcel(string keyword, string JobFunc, string sort = "客戶名稱")
         {
             XSSFWorkbook excel = new XSSFWorkbook();
             XSSFSheet sheet = excel.CreateSheet("客戶銀行資訊") as XSSFSheet;
 
             var data = new List<客戶聯絡人>();
-            if (string.IsNullOrEmpty(currentKeyword) && string.IsNullOrEmpty(currentJobFunc))
-                data = repo.All(false).ToList();
-            else
-                data = repo.Search(currentKeyword, currentJobFunc).ToList();
-
+          
+                data = repo_客戶聯絡人.All(false, keyword,JobFunc, sort).ToList();
+      
             if (data.Count() == 0)
             {
                 TempData["ErrMsg"] = "沒有資料可以匯出";
@@ -233,7 +178,7 @@ namespace MVC5Homework.Controllers
 
         public ActionResult BatchUpdate(int? 客戶Id)
         {
-            var data = repo.GetDataByID(客戶Id);
+            var data = repo_客戶聯絡人.GetDataByID(客戶Id);
             ViewData.Model = data;
             ViewBag.客戶Id = 客戶Id;
             return PartialView();
@@ -244,7 +189,7 @@ namespace MVC5Homework.Controllers
         {
             if (data == null)
             {
-                ViewData.Model = repo.GetDataByID(客戶Id);
+                ViewData.Model = repo_客戶聯絡人.GetDataByID(客戶Id);
                 TempData["UpdateMsg"] = "沒有資料可以更新!";
 
                 return PartialView();
@@ -253,15 +198,15 @@ namespace MVC5Homework.Controllers
             {
                 foreach (var item in data)
                 {
-                    var 客戶聯絡人 = repo.Find(item.Id);
+                    var 客戶聯絡人 = repo_客戶聯絡人.Find(item.Id);
                     客戶聯絡人.職稱 = item.職稱;
                     客戶聯絡人.手機 = item.手機;
                     客戶聯絡人.電話 = item.電話;
                 }
-                repo.UnitOfWork.Commit();
+                repo_客戶聯絡人.UnitOfWork.Commit();
                 TempData["UpdateMsg"] = "聯絡人更新成功!";
             }
-            ViewData.Model = repo.GetDataByID(客戶Id);
+            ViewData.Model = repo_客戶聯絡人.GetDataByID(客戶Id);
             ViewBag.客戶Id = 客戶Id;
 
             if (TempData["UpdateMsg"] == null)

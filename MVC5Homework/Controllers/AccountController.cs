@@ -1,9 +1,5 @@
 ﻿using MVC5Homework.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -11,11 +7,10 @@ using System.Web.Security;
 namespace MVC5Homework.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         string userData = "";
-
-        客戶資料Repository repo = RepositoryHelper.Get客戶資料Repository();
+        string customID = "";
         [AllowAnonymous]
         // GET: Account
         public ActionResult Login()
@@ -48,7 +43,7 @@ namespace MVC5Homework.Controllers
             // Create the cookie.
             Response.Cookies.Add(new HttpCookie(FormsAuthentication.FormsCookieName, encTicket));
 
-            return RedirectToAction("Edit", "客戶資料");
+            return RedirectToAction("Edit", "客戶資料", new { id= customID });
 
         }
 
@@ -61,13 +56,21 @@ namespace MVC5Homework.Controllers
                 password = data.Password;
 
             }
-            Byte[] data1ToHash = (new UnicodeEncoding()).GetBytes(password);
-            byte[] hashvalue1 = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5")).ComputeHash(data1ToHash);
-            string strPassword = Convert.ToBase64String(hashvalue1);
+            
+            string strPassword = TransferPwd(password);
             customData = repo.Find(data.Account, strPassword);
             if (customData != null)
             {
-                userData = "member";
+                if (customData.帳號 == "admin")
+                {
+                    userData = "admin";
+                }
+                else
+                {
+                    userData = "member";
+                }
+                customID = customData.Id.ToString();
+
                 return true;
             }
             else

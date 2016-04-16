@@ -20,6 +20,7 @@ namespace MVC5Homework.Models
 
         [StringLength(20, ErrorMessage = "欄位長度不得大於 20 個字元")]
         [Required]
+        [帳號不可重複(ErrorMessage = "帳號重複")]
         public string 帳號 { get; set; }
 
         [StringLength(20, ErrorMessage = "欄位長度不得大於 20 個字元")]
@@ -51,6 +52,8 @@ namespace MVC5Homework.Models
         [Required]
         public int 類別Id { get; set; }
 
+        public bool 是否已刪除 { get; set; }
+        
         public virtual ICollection<客戶銀行資訊> 客戶銀行資訊 { get; set; }
         public virtual ICollection<客戶聯絡人> 客戶聯絡人 { get; set; }
         public virtual 客戶分類 客戶分類 { get; set; }

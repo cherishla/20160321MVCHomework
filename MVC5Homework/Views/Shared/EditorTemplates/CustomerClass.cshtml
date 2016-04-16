@@ -1,0 +1,15 @@
+﻿@model int?
+    @{
+        var repo = MVC5Homework.Models.RepositoryHelper.Get客戶分類Repository();
+
+        var classList = new SelectList(repo.All(),  "Id", "類別", Model);
+    }		  
+
+    @if (Model.HasValue)    
+    {
+        @Html.DropDownList("", classList, "全部類別", new { @Class="form-control"})
+    }
+    else
+    {
+      @Html.DropDownList("", classList, "全部類別", new { onchange = "this.form.submit();", @Class = "form-control" })
+    }

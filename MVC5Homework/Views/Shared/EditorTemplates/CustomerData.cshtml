@@ -1,0 +1,9 @@
+﻿@model int?
+@{
+    var repo = MVC5Homework.Models.RepositoryHelper.Get客戶資料Repository();
+
+    var classList = new SelectList(repo.All(false), "Id", "客戶名稱", Model);
+}
+
+@Html.DropDownList("", classList, "請選擇", new { @Class = "form-control" })
+

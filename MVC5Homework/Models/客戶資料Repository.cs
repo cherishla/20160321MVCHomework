@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Data.Entity;
-
+using System.Linq.Dynamic;
 namespace MVC5Homework.Models
 {   
 	public  class 客戶資料Repository : EFRepository<客戶資料>, I客戶資料Repository
@@ -11,6 +11,41 @@ namespace MVC5Homework.Models
         {
             return base.All().Include(p=>p.客戶分類).Where(p => p.是否已刪除 == false);
         }
+
+        internal bool CheckAccount(object value)
+        {
+            var data = All(false).FirstOrDefault(p => p.帳號 == value.ToString());
+
+            if (data != null)
+                return false;
+            else
+                return true;
+        }
+
+        /// <summary>
+        /// 搜尋全部資料
+        /// </summary>
+        /// <param name="isAll"></param>
+        /// <returns></returns>
+        public IQueryable<客戶資料> All(bool isAll, string sort, string 類別Id, string keyword)
+        {
+            if (sort == "類別" || sort == "類別 desc")
+                sort = $@"客戶分類.{sort}";
+            if (string.IsNullOrEmpty(類別Id) && string.IsNullOrEmpty(keyword))
+            {
+                if (isAll)
+                {
+                    return base.All().Include(p => p.客戶分類).OrderBy(sort);
+                }
+                else
+                {
+                    return this.All().OrderBy(sort);
+                }
+            }
+            else
+                return Search(類別Id, keyword, sort);
+        }
+
         /// <summary>
         /// 搜尋全部資料
         /// </summary>
@@ -33,7 +68,7 @@ namespace MVC5Homework.Models
         /// </summary>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        public IQueryable<客戶資料> Search(string 類別Id, string keyword)
+        public IQueryable<客戶資料> Search(string 類別Id, string keyword, string sort)
         {
             var 客戶資料 = All(false).Where(p => p.客戶名稱.Contains(keyword)
                         || p.統一編號.Contains(keyword) || p.電話.Contains(keyword)
@@ -47,7 +82,7 @@ namespace MVC5Homework.Models
                客戶資料 = 客戶資料.Where(p => p.類別Id == i);
             }
 
-            return 客戶資料;
+            return 客戶資料.OrderBy(sort);
              
         }
 

@@ -72,6 +72,14 @@
       <HintPath>..\packages\NPOI.2.1.3.1\lib\net40\NPOI.OpenXmlFormats.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -197,6 +205,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -296,6 +305,7 @@
     <Compile Include="Models\客戶銀行資訊Repository.cs">
       <DependentUpon>IRepository.EF6.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\帳號不可重複Attribute.cs" />
     <Compile Include="Models\手機格式錯誤Attribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -303,6 +313,7 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -403,9 +414,18 @@
     <Content Include="Views\Error\Index.cshtml" />
     <Content Include="Views\Shared\Error2.cshtml" />
     <Content Include="Views\Account\FirstLogin.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\CustomerClass.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\客戶資料.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\客戶資料.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\客戶銀行資訊.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\客戶銀行資訊.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\CustomerData.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\客戶聯絡人.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\客戶聯絡人.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Documentation\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
